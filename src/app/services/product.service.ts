@@ -51,7 +51,7 @@ export class ProductsService {
         products.map((item) => {
           return {
             ...item,
-            taxes: 0.19 * item.price,
+            taxes: 0.13 * item.price,
           };
         })
       )
