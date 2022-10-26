@@ -48,8 +48,8 @@ fdescribe('ProductService', () => {
     });
   });
 
-  describe('tests for getAll', () => {
-    it('should return a product list', (doneFn) => {
+  describe('Test para "getAll"', () => {
+    it('Deberia retornar una lista de productos', (doneFn) => {
       //Arrange
       const mockData: Product[] = generateManyProducts(3);
       //Act
@@ -65,16 +65,24 @@ fdescribe('ProductService', () => {
       httpCrtl.verify();
     });
 
-    it('should return product list width taxes', (doneFn) => {
+    it('Deberia retornar una lista de productos con taxes', (doneFn) => {
       // Arrange
       const mockData: Product[] = [
         {
           ...generateOneProduct(),
-          price: 100, //100 * .19 = 19
+          price: 100, //100 * .13 = 13
         },
         {
           ...generateOneProduct(),
-          price: 200, //200 * .19 = 38
+          price: 200, //200 * .13 = 26
+        },
+        {
+          ...generateOneProduct(),
+          price: 0, //0 * .13 = 0
+        },
+        {
+          ...generateOneProduct(),
+          price: -200, //-200 * .13 = 0
         },
       ];
       //Act
@@ -83,12 +91,35 @@ fdescribe('ProductService', () => {
         expect(data.length).toEqual(mockData.length);
         expect(data[0].taxes).toEqual(13);
         expect(data[1].taxes).toEqual(26);
+        expect(data[2].taxes).toEqual(0);
+        expect(data[3].taxes).toEqual(0);
         doneFn();
       });
       //http config
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpCrtl.expectOne(url);
       req.flush(mockData);
+      httpCrtl.verify();
+    });
+
+    it('Deberia enviar query params con limit 10 & offset 5', (doneFn) => {
+      //Arrange
+      const mockData: Product[] = generateManyProducts(3);
+      const limit = 10;
+      const offset = 5;
+      //Act
+      productService.getAll(limit, offset).subscribe((data) => {
+        //Assert
+        expect(data.length).toEqual(mockData.length);
+        doneFn();
+      });
+      //http config
+      const url = `${environment.API_URL}/api/v1/products?limit=${limit}&offset=${offset}`;
+      const req = httpCrtl.expectOne(url);
+      req.flush(mockData);
+      const params = req.request.params;
+      expect(params.get('limit')).toEqual(`${limit}`);
+      expect(params.get('offset')).toEqual(`${offset}`);
       httpCrtl.verify();
     });
   });
