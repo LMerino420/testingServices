@@ -1,11 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { ProductsService } from './product.service';
+
 import {
   Product,
   CreateProductDTO,
   UpdateProductDTO,
 } from '../models/product.model';
+
 import { environment } from '../../environments/environment';
+
 import {
   generateManyProducts,
   generateOneProduct,
@@ -15,19 +18,32 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { HttpStatusCode } from '@angular/common/http';
+
+import { HttpStatusCode, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TokenInterceptor } from '../interceptors/token.interceptor';
+import { TokenService } from './token.service';
 
 fdescribe('ProductService', () => {
   let productService: ProductsService;
   let httpCrtl: HttpTestingController;
+  let tokenService: TokenService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProductsService],
+      providers: [
+        ProductsService,
+        TokenService,
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: TokenInterceptor,
+          multi: true,
+        },
+      ],
     });
     productService = TestBed.inject(ProductsService);
     httpCrtl = TestBed.inject(HttpTestingController);
+    tokenService = TestBed.inject(TokenService);
   });
 
   afterEach(() => {
@@ -42,6 +58,7 @@ fdescribe('ProductService', () => {
     it('Deberia retornar una lista de productos', (doneFn) => {
       // Arrange
       const mockData: Product[] = generateManyProducts(2);
+      spyOn(tokenService, 'getToken').and.returnValue('123');
       // Act
       productService.getAllSimple().subscribe((data) => {
         // Assert
@@ -52,6 +69,9 @@ fdescribe('ProductService', () => {
       // http Config
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpCrtl.expectOne(url);
+      const headers = req.request.headers;
+      // PRUEBA A INTERCEPTOR
+      expect(headers.get('Authorization')).toEqual(`Bearer 123`);
       req.flush(mockData);
     });
   });
