@@ -1,6 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ProductsService } from './product.service';
-import { Product } from '../models/product.model';
+import {
+  Product,
+  CreateProductDTO,
+  UpdateProductDTO,
+} from '../models/product.model';
 import { environment } from '../../environments/environment';
 import {
   generateManyProducts,
@@ -25,6 +29,10 @@ fdescribe('ProductService', () => {
     httpCrtl = TestBed.inject(HttpTestingController);
   });
 
+  afterEach(() => {
+    httpCrtl.verify();
+  });
+
   it('Creacion del servicio', () => {
     expect(productService).toBeTruthy();
   });
@@ -44,7 +52,6 @@ fdescribe('ProductService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpCrtl.expectOne(url);
       req.flush(mockData);
-      httpCrtl.verify();
     });
   });
 
@@ -62,7 +69,6 @@ fdescribe('ProductService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpCrtl.expectOne(url);
       req.flush(mockData);
-      httpCrtl.verify();
     });
 
     it('Deberia retornar una lista de productos con taxes', (doneFn) => {
@@ -99,14 +105,13 @@ fdescribe('ProductService', () => {
       const url = `${environment.API_URL}/api/v1/products`;
       const req = httpCrtl.expectOne(url);
       req.flush(mockData);
-      httpCrtl.verify();
     });
 
-    it('Deberia enviar query params con limit 10 & offset 5', (doneFn) => {
+    it('Deberia enviar query params con limit 10 & offset 10', (doneFn) => {
       //Arrange
       const mockData: Product[] = generateManyProducts(3);
       const limit = 10;
-      const offset = 5;
+      const offset = 10;
       //Act
       productService.getAll(limit, offset).subscribe((data) => {
         //Assert
@@ -120,7 +125,74 @@ fdescribe('ProductService', () => {
       const params = req.request.params;
       expect(params.get('limit')).toEqual(`${limit}`);
       expect(params.get('offset')).toEqual(`${offset}`);
-      httpCrtl.verify();
+    });
+  });
+
+  describe('Test para "create"', () => {
+    it('Deberia retornar un nuevo producto', (doneFn) => {
+      //Arrange
+      const mockData = generateOneProduct();
+      const dto: CreateProductDTO = {
+        title: 'new Prod',
+        price: 420,
+        images: ['img'],
+        description: 'bla bla bla',
+        categoryId: 420,
+      };
+      //Act
+      productService.create({ ...dto }).subscribe((data) => {
+        //Asset
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
+      // Http config
+      const url = `${environment.API_URL}/api/v1/products`;
+      const req = httpCrtl.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.body).toEqual(dto);
+      expect(req.request.method).toEqual('POST');
+    });
+  });
+
+  describe('Test para "update"', () => {
+    it('Deberia actualizar un producto', (doneFn) => {
+      //Arrange
+      const mockData = generateOneProduct();
+      const dto: UpdateProductDTO = {
+        title: 'new title',
+      };
+      const productId = '1';
+      //Act
+      productService.update(productId, { ...dto }).subscribe((data) => {
+        //Asset
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
+      // Http config
+      const url = `${environment.API_URL}/api/v1/products/${productId}`;
+      const req = httpCrtl.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.body).toEqual(dto);
+      expect(req.request.method).toEqual('PUT');
+    });
+  });
+
+  describe('Test para "delete"', () => {
+    it('Deberia eliminar un producto', (doneFn) => {
+      //Arrange
+      const mockData = true;
+      const productId = '1';
+      //Act
+      productService.delete(productId).subscribe((data) => {
+        //Asset
+        expect(data).toEqual(mockData);
+        doneFn();
+      });
+      // Http config
+      const url = `${environment.API_URL}/api/v1/products/${productId}`;
+      const req = httpCrtl.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.method).toEqual('DELETE');
     });
   });
 });
