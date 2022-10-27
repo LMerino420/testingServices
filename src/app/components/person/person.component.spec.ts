@@ -115,7 +115,7 @@ class HostComponent {
   }
 }
 
-fdescribe('PersonComponent desde HostComponent', () => {
+describe('PersonComponent desde HostComponent', () => {
   let component: HostComponent;
   let fixture: ComponentFixture<HostComponent>;
 
