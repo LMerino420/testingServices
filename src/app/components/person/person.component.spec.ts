@@ -40,7 +40,7 @@ fdescribe('PersonComponent', () => {
     //Act
     fixture.detectChanges();
     //Assert
-    expect(h3Element?.textContent).toContain(expectMsg);
+    expect(h3Element?.textContent).toEqual(expectMsg);
   });
 
   it('Deberia tener un <p>Mi altura es {{person?.age}}</p>', () => {
