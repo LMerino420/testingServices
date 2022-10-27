@@ -1,11 +1,7 @@
 <section class="container">
   <h1>PRODUCTS COMPONENT</h1>
   <div class="products-grid">
-    <figure *ngFor="let item of products">
-      <img [src]="item.images[0]" alt="" />
-      <figcaption>
-        {{ item.title }} - {{ item.price | currency: "USD" }}
-      </figcaption>
-    </figure>
+    <app-product *ngFor="let product of products" [product]="product">
+    </app-product>
   </div>
 </section>
