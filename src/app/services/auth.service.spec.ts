@@ -9,7 +9,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 
-fdescribe('AuthService', () => {
+describe('AuthService', () => {
   let authService: AuthService;
   let httpCrtl: HttpTestingController;
   let tokenService: TokenService;
