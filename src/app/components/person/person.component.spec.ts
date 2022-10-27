@@ -81,4 +81,21 @@ fdescribe('PersonComponent', () => {
     //Assert
     expect(btnElement.textContent).toContain(expectMsg);
   });
+
+  it('Llamado al evento OUTPUT cuando se hace click', () => {
+    //Arrange
+    const expextPerson = new Person('Leo', 'Messi', 26, 84, 1.8);
+    component.person = expextPerson;
+    const btnDebug = fixture.debugElement.query(By.css('button.btn-choose'));
+
+    let selectdPerson: Person | undefined;
+    component.onSelected.subscribe((person) => {
+      selectdPerson = person;
+    });
+    //Act
+    btnDebug.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    //Assert
+    expect(selectdPerson).toEqual(expextPerson);
+  });
 });
