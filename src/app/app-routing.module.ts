@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProductsComponent } from './components/products/products.component';
 import { PicoPreviewComponent } from './components/pico-preview/pico-preview.component';
 import { PeopleComponent } from './components/people/people.component';
+import { OtherComponent } from './components/other/other.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path: 'people',
     component: PeopleComponent,
+  },
+  {
+    path: 'others',
+    component: OtherComponent,
   },
 ];
 
