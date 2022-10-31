@@ -11,6 +11,7 @@ import { ProductsService } from '../../services/product.service';
 
 import { ProductComponent } from '../product/product.component';
 import { ProductsComponent } from './products.component';
+import { By } from '@angular/platform-browser';
 
 fdescribe('ProductsComponent', () => {
   let component: ProductsComponent;
@@ -112,5 +113,21 @@ fdescribe('ProductsComponent', () => {
       expect(component.rta).toEqual(mockMsg);
       expect(valueService.getPromise).toHaveBeenCalled();
     });
+
+    it('Deberia mostrar <p>Mock string</p> cuando el boton sea clickeado', fakeAsync(() => {
+      //Arrage
+      const mockMsg = 'Mock string';
+      valueService.getPromise.and.returnValue(Promise.resolve(mockMsg));
+      const btnDe = fixture.debugElement.query(By.css('.btn-promisse'));
+      //Act
+      btnDe.triggerEventHandler('click', null);
+      tick();
+      fixture.detectChanges();
+      const rtaDe = fixture.debugElement.query(By.css('p.p-rta'));
+      //Assert
+      expect(component.rta).toEqual(mockMsg);
+      expect(valueService.getPromise).toHaveBeenCalled();
+      expect(rtaDe.nativeElement.textContent).toEqual(mockMsg);
+    }));
   });
 });
